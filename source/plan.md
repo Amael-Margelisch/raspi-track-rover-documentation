@@ -18,50 +18,33 @@ Ma principale motivation est d'explorer un nouveau système d'exploitation diff�
 
 ## Manuel / conseils d'utilisation
 
+Pour entrer dans le Raspberry Pi il faut soit y connecter le cable HDMI et un clavier et une souris plus son cable d'alimentation soit s'y connecter par SSH. Les informations de login sont les suivantes utilisateur : amael, mot de passe 123456, wifi: Youxipass, mot de passe wifi : nbkd5841.
 
-L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande - python nom_du_fichier.py, soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
+L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande amael@raspberrypi:~ $ python /home/amael/Desktop/raspi_rover_main.py, soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
 
-Il est important de choisir une valeur de tolérance appropriée : une valeur trop petite rendrait la zone centrale de détection trop étroite, ce qui rendrait le comportement du robot instable car il ne parviendrait jamais à atteindre cette zone avec ses paramètres de correction de dix degrés. Des valeurs de tolérance généralement recommandées se situent entre 220 et 290 pixels.
-
-Une fois le programme lancé, il suffit de se placer devant la caméra pour démarrer la reconnaissance et le suivi. Il est important de noter que vu que la reconnaissance tourne sur Raspberry Pi elle n'est pas très répondante et donc il vaut mieux éviter les mouvements brusques. De plus, le haar_cascade utilisé pour la reconnaissance est trés sensible a l'éclairage et aux conditions environmental ce qui parfois le rend peu précis mais c'est aussi le moins lourd.
 ```{figure} img/rover_vision_schematic.png
 ---
 width: 100%
 ---
 Schéma de la vision du rover et de la forme que prend la tolérance.
 ```
+
+Il est important de choisir une valeur de tolérance appropriée : une valeur trop grande rendrait la zone centrale de détection trop étroite, ce qui rendrait le comportement du robot instable car il ne parviendrait jamais à atteindre cette zone avec ses paramètres de correction. Des valeurs de tolérance généralement recommandées se situent entre 220 et 290 pixels.
+
+Une fois le programme lancé, il suffit de se placer devant la caméra pour démarrer la reconnaissance et le suivi. Il est important de noter que vu que la reconnaissance tourne sur Raspberry Pi elle n'est pas très vive et donc il vaut mieux éviter les mouvements brusques. De plus, l'algorithme utilisé pour la reconnaissance est très sensible à l'éclairage et aux conditions environmentales ce qui parfois le rend peu précis et instable. Une fois le programme lancé il suffit de se deplacer devant le rover pour que la caméra suive.
+
 :::{note}
 
-Notez qu'il est possible que la caméra effectue parfois un mouvement brusque pour se recentrer. Pour corriger ce problème, il suffit de se placer devant la caméra et elle se réalignera automatiquement par rapport au robot.
+Notez qu'il est possible que la caméra effectue parfois un mouvement brusque vers la droite ou la gauche. Pour corriger ce problème, il suffit de se placer devant la caméra et elle se réalignera automatiquement par rapport au robot.
 :::
 
 ## Explication du fonctionnement du code
 
-Cette partie peut contenir plusieurs chapitres (entrées dans la `toctree` du
-fichier `source/index.rst`). Elle doit contenir les éléments suivants
-
-- Travail effectué par chacun des membres pour les binômes. Cela peut se faire
-  en indiquant les fonctionnalités développées par chacun et les fichiers
-  concernés
-
-- Principaux fichiers, en particulier le **point d'entrée** (*entry point*), à
-  savoir le fichier principal.
-
-- Brève présentation des concepts fondamentaux et spécifiques utilisés dans le
-  projet (exemple : WebSockets, programmation asynchrone, framework /
-  technologies, ...)
-
-- Explication d'au moins parties du code source qui sont plus difficiles à
-  comprendre
-
-- Présentation d'un élément qui a créé des difficultés et les solutions
-  envisagées / trouvées.
-
-Le fichier d'entrée de ce projet est nom_du_fichier.py, il se situe dans /home/amael/Desktop, il permet de lancer le projet.
+Le fichier d'entrée de ce projet est raspi_rover_main.py, il se situe dans /home/amael/Desktop, il permet de lancer le projet.
 
 Pour ce projet j'utilise OpenCV, qui est une librairie python qui regroupe les algorithmes utiles dans le Computer Vision,  j'utilise le Haar Cascade c'est un modèle préentraine de OpenCV pour la detection de visage, et le Raspberry Pi et des moteurs LEGO techniques.
 
-Parties de Code difficiles à comprendre.
+Explication de certaines parties du code.
 
 ```{code-block} python
 ---
@@ -73,6 +56,8 @@ from picamera2 import Picamera2
 from buildhat import Motor
 from buildhat import MotorPair
 ```
+Cette partie importe les différente librairies nécessaires au fonctionement du code.
+
 ```{code-block} python
 ---
 emphasize-lines: 3-4
@@ -83,6 +68,8 @@ while True:
   gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
   face_rect = haar_cascade.detectMultiScale(gray_frame, scaleFactor=1.2, minNeighbors=4, minSize=(80,80))
 ```
+Cette partie permet de prendre une image depuis la camera du Raspberry Pi sous la forme d'un tableau numpy (numpy array) cette image est désormais stocké sous la variable ''frame'' puis pour que la detection de visage avec haar_cascade fonctionne il faut passer cette image en échelle de gris, c'est ce que cv.cvtColor(frame, cv.COLOR_BGR2GRAY) fait. On récupère ensuite l'image en échelle de gris dans la variable ''gray_frame'' et on la fait passer dans la fonction  haar_cascade.detectMultiScale(gray_frame, scaleFactor=1.2, minNeighbors=4, minSize=(80,80)) qui prend en paramètre une image, scale Factor - un facteur qui spécifie dans quelle mesure la taille de l’image est réduite à chaque échelle d’image, minNeighbors - détermine la quantité de voisins que chaque rectangle doit avoir pour le conserver, en bref, c'est un paramètre qui permet de rêgler la qualité de la détection de visage et minSize est un paramètre qui défini la taille minimum d'un visage pour qu'il soit détecté, cette fonction retourne une liste avec les coordonnées du visage par rapport à l'image ainsi que sa hauteur et sa largeur.
+
 ```{code-block} python
 ---
 linenos: true
@@ -92,6 +79,8 @@ for (x,y,w,h) in face_rect:
   cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
   cv.circle(frame, (x + (w // 2), y + (h // 2)), 1, (255, 255, 0), 4)
 ```
+Cette partie trace le rectangle qui représente la détection du visage par l'algorithme, et le cercle qui représente le centre de ce rectangle.
+
 ```{code-block} python
 ---
 linenos: true
@@ -105,16 +94,16 @@ if x + (w // 2) > corx and y + (h // 2) > cory and x + (w // 2) < width-corx and
              
     if pimot.get_aposition() > 0: # if camera is tilted to the right - instruction for movement motor to correct heading (turning right)
         # first motor negative degrees
-        lr1_mot = (10 * max_amplitude_motpiv * 2) * (-1)
+        lr1_mot = (10 * max_amplitude_motpiv * 3) * (-1)
         # second motor positive degrees
-        lr2_mot = (10 * max_amplitude_motpiv * 2)
+        lr2_mot = (10 * max_amplitude_motpiv * 3)
                 
     elif pimot.get_aposition() < 0: # if camera is tilted to the left - instruction for movement motor to correct heading (turning left)
         # first motor positive degrees and second motor positive degrees
         # When camera turn x degrees motor movement must turn for 2x (experimental values -> is currently working on)
 
-        lr1_mot = 10 * max_amplitude_motpiv * 2
-        lr2_mot = 10 * max_amplitude_motpiv * 2
+        lr1_mot = 10 * max_amplitude_motpiv * 3
+        lr2_mot = 10 * max_amplitude_motpiv * 3
            
     ''' 
     #If unindexed that part make the robot react when target is up or down from the boundaries area by either reversing or advancing
@@ -149,6 +138,8 @@ if x + (w // 2) > corx and y + (h // 2) > cory and x + (w // 2) < width-corx and
                 
     pos = 0
 ```
+Ce code permet de vérifier si le visage se trouve dans la zone centrale de l'image délimitée par la tolérance fixée par l'utilisateur. Si le visage s'y trouve alors on vérifie si le premier moteur de la tourelle est incliné à gauche ou à droite si il est incliné à gauche alors on fait passer des instructions pour les moteurs de mouvement qui feront tourner le rover a gauche ce qui l'alignera avec sa cible et inversement à droite. Et on refait venir le moteur à la position 0 pour que lui aussi soit réaligner avec le corps du rover et la cible.
+
 ```{code-block} python
 ---
 linenos: true
@@ -168,6 +159,9 @@ elif y + (h // 2) < cory: # up
   pos = 1
             
 ```
+Ce code permet de réaligner la caméra par rapport au sujet si celui-ci se situe en haut de l'image. Le réalignement s'effectue avec le mouvement du deuxième moteur de la tourelle.
+Des variables sont incrémenter et décrementer ces variables permettent de s'assurer que l'inclinaison de la camera ne dépasse 125 degrées en haut (amplitude_motcam_high) ou en bas (amplitude_motcam_low).
+
 ```{code-block} python
 ---
 linenos: true
@@ -184,14 +178,21 @@ elif x + (w // 2) > width-corx: # right
 
   pos = 3
 ```
+Pareil pour cette partie, sauf qu'elle gère l'inclinaison et le suivi si la cible (visage) se trouve à droite de la caméra. Elle comporte aussi une sécurité pour éviter une trop grande amplitude de la caméra et bride le moteur a 60 degrées de liberté. 
 
-Un élement que j'ai trouve difficile à été l'installation des dépendances et de faire marcher les différent système ensembles, prendre en compte le élement des moteurs avec ces de la camera etc... Et construire un robot qui permettait par sa conception de faire tout fonctionner.
+Les éléments que j'ai trouvé compliqué ont été les suivants: installer toutes les dépendances et le faire fonctionner ensembles, devoir s'adapter aux contraintes du monde et adapter le code en fonction. 
+Par exemple trouver les bonnes valeurs pour tourner les moteurs ou encore les valeurs de sécurités ont été assez amusante à trouver. Il y a aussi les valeurs dans la fonction qui détecte les visages oû il a été nécessaire d'expérimenter un peu avec plusieurs valeurs pour avoir des résultats satisfaisants.
+
+Les technologies utilisées dans ce projet sont les suivantes: Raspberry Pi, OpenCV (haar_cascade) et les moteurs LEGO Technique. La technologie qui demande le plus d'explication est sans aucun doute OpenCV et ses dépendances. 
+
+OpenCV est une librairie open source qui regroupe de nombreux algorithmes de Computer Vision et de modification et altération d'images. L'algorithme que j'utilise dans mon projet se nomme Haar Cascade, c'est un modèle pré-entrainé mis a disposition par OpenCV pour la reconnaissance de visage en temps réel. Ce modèle à été proposé en premier par Paul Viola et Michael Jones dans leur publication, "Rapid Object Detection using a Boosted Cascade of Simple Features" en 2001. Ce modèle est une approche utilisant du machine learning qui entraine une fonction dite de cascade à reconnaitre des visages. Cette approche utilise des images en noir en blanc c'est pourquoi dans notre code nous devons transformer les images BGR en échelle de gris pour que le modèle puisse fonctionner.
+
 ## Regard critique et améliorations
 
-Dans l'ensemble je pense avoir plutôt repondu à mes objectifs initiaux. Le robot fait ce que lui demande et suit la visage d'une personne et corrige sa position par rapport a elle pour continuer à la suivre. Je pourrais cependant lever une critique sur l'ordinateur, en effet je n'avais pas réaliser que ce genre de processus consomme beaucoup de ressource et le RaspberryPi lui en a peu ce qui fait que parfois le framerate n'est pas très haut ce qui impère sur la qualité du suivi de visage, de plus je pense que bien que haar_cascade est plutot performant ces limitation lors de mauvais condition rendent la detection parfois difficile et inconsistente.
+Dans l'ensemble je pense avoir plutôt répondu à mes objectifs initiaux. Le robot fait ce que lui demande et suit le visage d'une personne et corrige sa position par rapport a elle pour continuer à la suivre. Je pourrais cependant lever une critique sur l'ordinateur, en effet je n'avais pas réaliser que ce genre de processus consomme beaucoup de ressources et le RaspberryPi lui en a peu ce qui fait que parfois le framerate n'est pas très haut ce qui impère sur la qualité du suivi de visage, de plus je pense que bien que haar_cascade est plutot performant ces limitation lors de mauvais condition rendent la détection parfois difficile et inconsistente.
 
 J'ai aussi sous-estime le fait d'apprendre un nouveau système d'exploitation pour faire ce projet, apprendre la logique de Linux m'a pris plus de temps que j'avais initialement anticipé. Et j'ai aussi rencontré de nombreux imprévus pour lier les système ensemble et le faire fonctionner en symbiose tous ensemble. Il y a aussi le fait que vu que je fait interface entre le monde et l'ordinateur il faut modifier certaines valeurs par rapport a l'expérience que on en a, savoir si il faut plus 20 ou 30 degré pour tourner par exemple est que la valeur négative va me permmettre de tourner ou fait il une valeur positive à la place etc ...
 
 ## Discussion
 
-Je pense que j'aurais du mieux planifier mon temps par arpport au potentiels imprévues qui aurait pu arriver.  J'ai aussi sous-estimer l'aspect temporel de certains aspects de mon projet, la construction du rover par exemple et la conception. Mais malgré ces problème j'ai aussi trouvé que faire un projet de A a Z peut etre vraiment sympa et relever les obstacles est vraiment tres interessant. Mon projet aurait pu aussi bénéficier de certains amélioration pour une version 2 par exemple le fait que le robot puisse bouger et suivre une personne en la suivant meme quand elle marche par exemple avec une batterie cela serait possible mais maitenant le rover est lié a une prise ce qui limite ses mouvements. 
+Je pense que j'aurais du mieux planifier mon temps par arpport au potentiels imprévues qui aurait pu arriver.  J'ai aussi sous-estimer l'aspect temporel de certains aspects de mon projet, la construction du rover par exemple et la conception. Mais malgré ces problème j'ai aussi trouvé que faire un projet de A a Z peut-etre vraiment sympa et relever les obstacles est vraiment tres interessant. Mon projet aurait pu aussi bénéficier de certains amélioration pour une version 2 par exemple le fait que le robot puisse bouger et suivre une personne en la suivant meme quand elle marche par exemple avec une batterie cela serait possible mais maitenant le rover est lié a une prise ce qui limite ses mouvements. 
