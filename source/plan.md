@@ -14,23 +14,25 @@ documentation du projet.
 
 ## Présentation du projet
 
-- Motivation / intérêt du projet
-- Motivation personnelle à réaliser ce projet
+Ma principale motivation est d'explorer un nouveau système d'exploitation différent de Windows, en l'occurrence Linux. Je voulais aussi découvrir une technologie comme le Raspberry Pi et expérimenter avec des concepts de Machine Learning et de Computer Vision grâce à OpenCV. Je voulais également découvrir un peu la robotique et ce projet me permet de faire exactement cela. J'ai également hâte de voir comment l'ordinateur peut interagir avec le monde physique. En somme, ce projet me permet de m’essayer à la robotique et de voir comment un ordinateur peut interagir avec le monde.
 
 ## Manuel / conseils d'utilisation
 
-Un software bien conçu ne nécessite pas vraiment de manuel d'utilisation pour
-les fonctionnalités basiques. Il est généralement mieux d'inclure de l'aide dans
-le logiciel et de rendre les fonctionnalités très intuitives et facilement
-"découvrables". Néanmoins, pour ce projet, vous devez indiquer les
-fonctionnalités de base et comment les utiliser.
 
+L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande - python nom_du_fichier.py, soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
+
+Il est important de choisir une valeur de tolérance appropriée : une valeur trop petite rendrait la zone centrale de détection trop étroite, ce qui rendrait le comportement du robot instable car il ne parviendrait jamais à atteindre cette zone avec ses paramètres de correction de dix degrés. Des valeurs de tolérance généralement recommandées se situent entre 220 et 290 pixels.
+
+Une fois le programme lancé, il suffit de se placer devant la caméra pour démarrer la reconnaissance et le suivi. Il est important de noter que vu que la reconnaissance tourne sur Raspberry Pi elle n'est pas très répondante et donc il vaut mieux éviter les mouvements brusques. De plus, le haar_cascade utilisé pour la reconnaissance est trés sensible a l'éclairage et aux conditions environmental ce qui parfois le rend peu précis mais c'est aussi le moins lourd.
+```{figure} img/rover_vision_schematic.png
+---
+width: 100%
+---
+Schéma de la vision du rover et de la forme que prend la tolérance.
+```
 :::{note}
 
-La documentation utilisateur devrait se limiter à 1-2 pages A4 dans Word au
-maximum. Il est conseillé de rajouter quelques captures d'écran pour faciliter
-la compréhension.
-
+Notez qu'il est possible que la caméra effectue parfois un mouvement brusque pour se recentrer. Pour corriger ce problème, il suffit de se placer devant la caméra et elle se réalignera automatiquement par rapport au robot.
 :::
 
 ## Explication du fonctionnement du code
@@ -55,17 +57,141 @@ fichier `source/index.rst`). Elle doit contenir les éléments suivants
 - Présentation d'un élément qui a créé des difficultés et les solutions
   envisagées / trouvées.
 
+Le fichier d'entrée de ce projet est nom_du_fichier.py, il se situe dans /home/amael/Desktop, il permet de lancer le projet.
+
+Pour ce projet j'utilise OpenCV, qui est une librairie python qui regroupe les algorithmes utiles dans le Computer Vision,  j'utilise le Haar Cascade c'est un modèle préentraine de OpenCV pour la detection de visage, et le Raspberry Pi et des moteurs LEGO techniques.
+
+Parties de Code difficiles à comprendre.
+
+```{code-block} python
+---
+#emphasize-lines: 3-4
+linenos: true
+---
+import cv2 as cv
+from picamera2 import Picamera2
+from buildhat import Motor
+from buildhat import MotorPair
+```
+```{code-block} python
+---
+emphasize-lines: 3-4
+linenos: true
+---
+while True:
+  frame = picam2.capture_array()
+  gray_frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+  face_rect = haar_cascade.detectMultiScale(gray_frame, scaleFactor=1.2, minNeighbors=4, minSize=(80,80))
+```
+```{code-block} python
+---
+linenos: true
+---
+for (x,y,w,h) in face_rect:
+  # Trace moving entities
+  cv.rectangle(frame, (x,y), (x+w, y+h), (0, 255, 0), 2)
+  cv.circle(frame, (x + (w // 2), y + (h // 2)), 1, (255, 255, 0), 4)
+```
+```{code-block} python
+---
+linenos: true
+---
+pos = -1 # error signal / no object detected
+  
+if x + (w // 2) > corx and y + (h // 2) > cory and x + (w // 2) < width-corx and  y + (h // 2) < height-cory:
+            
+    r1_mot, lr2_mot = 0, 0
+    up1_mot, up2_mot = 0, 0
+             
+    if pimot.get_aposition() > 0: # if camera is tilted to the right - instruction for movement motor to correct heading (turning right)
+        # first motor negative degrees
+        lr1_mot = (10 * max_amplitude_motpiv * 2) * (-1)
+        # second motor positive degrees
+        lr2_mot = (10 * max_amplitude_motpiv * 2)
+                
+    elif pimot.get_aposition() < 0: # if camera is tilted to the left - instruction for movement motor to correct heading (turning left)
+        # first motor positive degrees and second motor positive degrees
+        # When camera turn x degrees motor movement must turn for 2x (experimental values -> is currently working on)
+
+        lr1_mot = 10 * max_amplitude_motpiv * 2
+        lr2_mot = 10 * max_amplitude_motpiv * 2
+           
+    ''' 
+    #If unindexed that part make the robot react when target is up or down from the boundaries area by either reversing or advancing
+
+    if camot.get_aposition() > 0: # camera look up
+        up1_mot = -30
+        up2_mot = -30
+                
+    elif camot.get_aposition() < 0: # camera look down
+        up1_mot = 30
+        up2_mot = 30
+    '''
+             
+    print('// AllRobot Alignment To Target')
+
+    '''
+    # Optional additional informations
+
+    print(pimot.get_aposition(), ' = pos. abs. deg. motor C')
+    print(camot.get_aposition(), ' = pos. abs. deg. motor D')
+    print(max_amplitude_motcam_high,'//', max_amplitude_motcam_low, ' = cam slope (first = 0 -> h, second = 0 -> l')
+    '''
+            
+    pimot.run_to_position(0)
+    max_amplitude_motpiv = 0
+            
+    if lr1_mot != 0 or lr2_mot != 0:    
+        pair.run_for_degrees(lr1_mot, lr2_mot) #execute turn
+                
+    if up1_mot != 0 or up2_mot != 0:    
+        pair.run_for_degrees(up1_mot, up2_mot) #execute retreat to take distance or advance to close the gap 
+                
+    pos = 0
+```
+```{code-block} python
+---
+linenos: true
+---
+elif y + (h // 2) < cory: # up
+            
+  if amplitude_motcam_high <= 25:
+    camot.run_for_degrees(5)
+    amplitude_motcam_high += 1
+    amplitude_motcam_low -= 1
+  elif amplitude_motcam_high >= 25:
+    camot.run_to_position(0, 10)
+    amplitude_motcam_high = 0
+    amplitude_motcam_low = 0
+    pair.run_for_degrees(-90, -90, 10)
+
+  pos = 1
+            
+```
+```{code-block} python
+---
+linenos: true
+---
+elif x + (w // 2) > width-corx: # right
+            
+  if max_amplitude_motpiv <= 6:
+    pimot.run_for_degrees(10)
+    max_amplitude_motpiv += 1
+  elif max_amplitude_motpiv >= 6:
+    pimot.run_to_position(0)
+    max_amplitude_motpiv = 0
+    pair.run_for_degrees(30, 30)
+
+  pos = 3
+```
+
+Un élement que j'ai trouve difficile à été l'installation des dépendances et de faire marcher les différent système ensembles, prendre en compte le élement des moteurs avec ces de la camera etc... Et construire un robot qui permettait par sa conception de faire tout fonctionner.
 ## Regard critique et améliorations
 
-- Dans cette partie, vous jetez un retard critique sur votre projet, en
-  particulier par rapport aux objectifs initiaux. 
+Dans l'ensemble je pense avoir plutôt repondu à mes objectifs initiaux. Le robot fait ce que lui demande et suit la visage d'une personne et corrige sa position par rapport a elle pour continuer à la suivre. Je pourrais cependant lever une critique sur l'ordinateur, en effet je n'avais pas réaliser que ce genre de processus consomme beaucoup de ressource et le RaspberryPi lui en a peu ce qui fait que parfois le framerate n'est pas très haut ce qui impère sur la qualité du suivi de visage, de plus je pense que bien que haar_cascade est plutot performant ces limitation lors de mauvais condition rendent la detection parfois difficile et inconsistente.
 
-- Si vous estimez ne pas avoir réussi à satisfaire le cahier des charges initial
-  (objectifs initiaux), évoquez brièvement les difficultés rencontrées qui vous
-  en ont empêché et les éventuelles solutions que vous pourriez mettre en place
-  pour atteindre les objectifs.
+J'ai aussi sous-estime le fait d'apprendre un nouveau système d'exploitation pour faire ce projet, apprendre la logique de Linux m'a pris plus de temps que j'avais initialement anticipé. Et j'ai aussi rencontré de nombreux imprévus pour lier les système ensemble et le faire fonctionner en symbiose tous ensemble. Il y a aussi le fait que vu que je fait interface entre le monde et l'ordinateur il faut modifier certaines valeurs par rapport a l'expérience que on en a, savoir si il faut plus 20 ou 30 degré pour tourner par exemple est que la valeur négative va me permmettre de tourner ou fait il une valeur positive à la place etc ...
 
-## Ce que vous avez appris
+## Discussion
 
-- Expliquez brièvement ce que vous avez appris en réalisant votre projet (au
-  niveau technologique, conceptuel, gestion de projet, autres, ...)
+Je pense que j'aurais du mieux planifier mon temps par arpport au potentiels imprévues qui aurait pu arriver.  J'ai aussi sous-estimer l'aspect temporel de certains aspects de mon projet, la construction du rover par exemple et la conception. Mais malgré ces problème j'ai aussi trouvé que faire un projet de A a Z peut etre vraiment sympa et relever les obstacles est vraiment tres interessant. Mon projet aurait pu aussi bénéficier de certains amélioration pour une version 2 par exemple le fait que le robot puisse bouger et suivre une personne en la suivant meme quand elle marche par exemple avec une batterie cela serait possible mais maitenant le rover est lié a une prise ce qui limite ses mouvements. 

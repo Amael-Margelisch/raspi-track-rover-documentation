@@ -2,4 +2,6 @@
 
 # Présentation du projet
 
-Présentez votre projet sur cette page
+L'objectif de ce projet est de concevoir un rover capable de suivre la tête d'une personne à l'aide d'une caméra et de s'aligner par rapport à elle dans l'espace. Ce projet combine des aspects de robotique et de programmation. Pour ce faire, nous utilisons un Raspberry Pi 4 modèle B et son extension Build HAT pour contrôler les moteurs LEGO Technic qui permettront au rover de se déplacer dans l'espace. La caméra utilisée est le Module Caméra 2 du Raspberry Pi, qui servira d'interface entre le monde extérieur et l'ordinateur. La reconnaissance faciale sera gérée par OpenCV, une bibliothèque open source offrant des outils de reconnaissance faciale et de vision par ordinateur. Quant au rover lui-même, il est construit en LEGO.
+
+La structure du rover peut être divisée en trois modules principaux : tout d'abord, le module de mouvement, équipé de deux moteurs responsables de l'orientation globale du rover dans l'espace, assurant ainsi sa mobilité. Ensuite, le module de la caméra, doté de deux moteurs permettant son orientation dans l'espace : le premier moteur, intégré dans le corps du rover, assure l'orientation horizontale de la caméra, tandis que le second, monté sur le premier, permet l'orientation verticale, conférant ainsi à ce module - que nous appellerons la tourelle - deux degrés de liberté de mouvement. Enfin, le troisième module accueille le Raspberry Pi, situé à l'arrière du rover, où il contrôle l'ensemble du système.

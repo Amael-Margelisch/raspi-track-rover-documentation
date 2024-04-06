@@ -3,4 +3,4 @@
 # Regard critique et améliorations
 
 
-Écrire la conclusion de la documentation
+amélioration sur le processus et sur le projet fonctionalité supplémentaire etc ..

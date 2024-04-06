@@ -1,7 +1,7 @@
 ..  Documentation du projet - CSUD template
     
 
-Titre du projet (changer dans `source/index.rst`)
+Robot follow camera
 =================================
 
 ..  toctree::
