@@ -13,12 +13,18 @@ Ma principale motivation est d'explorer un nouveau système d'exploitation diff�
 
 Pour entrer dans le Raspberry Pi il faut soit y connecter le cable HDMI et un clavier et une souris plus son cable d'alimentation soit s'y connecter par SSH. 
 
-```{tip}
-Les informations de login sont les suivantes -->
-user : amael, password : 123456, wifi : Youxipass, password wifi : nbkd5841
+```{admonition} Informations de login
+User : amael / Password : 123456 / Wifi : Youxipass / Password Wifi : nbkd5841
 ```
 
-L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande amael@raspberrypi:~ $ python /home/amael/Desktop/raspi_rover_main.py, soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
+L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande
+```{code-block} python
+---
+linenos: false
+---
+ amael@raspberrypi:~ $ python /home/amael/Desktop/raspi_rover_main.py
+```
+soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
 
 ```{figure} img/rover_vision_schematic.png
 ---
@@ -33,7 +39,7 @@ Une fois le programme lancé, il suffit de se placer devant la caméra pour dém
 
 :::{note}
 
-Notez qu'il est possible que la caméra effectue parfois un mouvement brusque vers la droite ou la gauche. Pour corriger ce problème, il suffit de se placer devant la caméra et elle se réalignera automatiquement par rapport au robot.
+Il est possible que la caméra effectue parfois un mouvement brusque vers la droite ou la gauche. Pour corriger ce problème, il suffit de se placer devant la caméra et elle se réalignera automatiquement par rapport au robot.
 :::
 
 ## Explication du fonctionnement du code
@@ -47,7 +53,7 @@ Explication de certaines parties du code.
 ```{code-block} python
 ---
 #emphasize-lines: 3-4
-linenos: true
+linenos: false
 ---
 import cv2 as cv
 from picamera2 import Picamera2
@@ -59,7 +65,7 @@ Cette partie importe les différente librairies nécessaires au fonctionement du
 ```{code-block} python
 ---
 emphasize-lines: 3-4
-linenos: true
+linenos: false
 ---
 while True:
   frame = picam2.capture_array()
@@ -70,7 +76,7 @@ Cette partie permet de prendre une image depuis la camera du Raspberry Pi sous l
 
 ```{code-block} python
 ---
-linenos: true
+linenos: false
 ---
 for (x,y,w,h) in face_rect:
   # Trace moving entities
@@ -81,7 +87,7 @@ Cette partie trace le rectangle qui représente la détection du visage par l'al
 
 ```{code-block} python
 ---
-linenos: true
+linenos: false
 ---
 pos = -1 # error signal / no object detected
   
@@ -140,7 +146,7 @@ Ce code permet de vérifier si le visage se trouve dans la zone centrale de l'im
 
 ```{code-block} python
 ---
-linenos: true
+linenos: false
 ---
 elif y + (h // 2) < cory: # up
             
@@ -162,7 +168,7 @@ Des variables sont incrémenter et décrementer ces variables permettent de s'as
 
 ```{code-block} python
 ---
-linenos: true
+linenos: false
 ---
 elif x + (w // 2) > width-corx: # right
             

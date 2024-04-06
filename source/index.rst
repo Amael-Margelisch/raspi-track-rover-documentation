@@ -13,14 +13,6 @@ Raspi-Rover Follow/Track
     critique.md
     references.rst
 
-
-..  toctree::
-    :maxdepth: 2
-    :caption: Tutoriel Sphinx
-
-    tutoriel-sphinx/index.rst
-
-
 ..
     Indices and tables
     ==================
