@@ -1,6 +1,6 @@
 class DocumentInfos:
 
-    title = u'Camera robot follow'
+    title = u'Raspi-Rover Follow/Track '
     first_name = 'Amaël'
     last_name = 'Margelisch'
     author = f'{first_name} {last_name}'
