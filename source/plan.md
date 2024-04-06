@@ -2,13 +2,6 @@
 
 # Plan 
 
-:::{note}
-
-Cette page décrit en gros les éléments qui doivent être présents dans la
-documentation du projet.
-
-:::
-
 :::{contents}
 :::
 
@@ -18,7 +11,12 @@ Ma principale motivation est d'explorer un nouveau système d'exploitation diff�
 
 ## Manuel / conseils d'utilisation
 
-Pour entrer dans le Raspberry Pi il faut soit y connecter le cable HDMI et un clavier et une souris plus son cable d'alimentation soit s'y connecter par SSH. Les informations de login sont les suivantes utilisateur : amael, mot de passe 123456, wifi: Youxipass, mot de passe wifi : nbkd5841.
+Pour entrer dans le Raspberry Pi il faut soit y connecter le cable HDMI et un clavier et une souris plus son cable d'alimentation soit s'y connecter par SSH. 
+
+```{tip}
+Les informations de login sont les suivantes -->
+user : amael, password : 123456, wifi : Youxipass, password wifi : nbkd5841
+```
 
 L'utilisation du rover est assez simple : le fichier permettant de lancer le programme est situé sur le Raspberry Pi et peut être exécuté soit via le terminal en utilisant la commande amael@raspberrypi:~ $ python /home/amael/Desktop/raspi_rover_main.py, soit en ouvrant Thonny et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, qui correspond à la distance en pixels séparant la zone de détection des bords de l'image (voir schéma).
 

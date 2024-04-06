@@ -9,7 +9,7 @@ class DocumentInfos:
     seminary_title = u'Projet OCI'
     tutor = u"Cédric Donner"
     release = "(Version finale)"
-    repository_url = "https://github.com/Amael-Margelisch/robot-camera-follow"
+    repository_url = "https://github.com/Amael-Margelisch/raspi-rover-follow"
 
     @classmethod
     def date(cls):

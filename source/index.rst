@@ -1,7 +1,7 @@
 ..  Documentation du projet - CSUD template
     
 
-Robot follow camera
+Raspi-Rover Follow/Track
 =================================
 
 ..  toctree::
