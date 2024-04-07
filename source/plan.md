@@ -29,7 +29,7 @@ linenos: false
 ---
  amael@raspberrypi:~ $ python /home/amael/Desktop/raspi_rover_main.py
 ```
-soit en ouvrant un éditeur de code et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, cette tolérance fait référence au nombre de pixel qui séparent les bord de l'image et la zone centrale qui est considérée comme le point d'équilibre que le rover voudra atteindre (Pour une explication plus imagée voir le schéma la tolérance y est représentée par les double flèches).
+soit en ouvrant un éditeur de code et en lançant le code à partir de là. Lors du lancement, l'utilisateur est invité à spécifier la tolérance, cette tolérance fait référence au nombre de pixel qui séparent les bord de l'image et la zone centrale qui est considérée comme le point d'équilibre que le rover voudra atteindre (Pour une explication plus imagée voir le schéma, la tolérance y est représentée par les doubles flèches).
 
 ```{figure} img/rover_vision_schematic.png
 ---
@@ -38,7 +38,7 @@ width: 100%
 Schéma de la vision du rover
 ```
 
-Il est important de choisir une valeur de tolérance appropriée : une valeur trop grande rendrait la zone centrale de détection trop étroite, ce qui rendrait le comportement du rover instable car il ne parviendrait jamais à atteindre cette zone avec ses paramètres de correction (axe haut-bas 5°; axe droite-gauche 10°). Des valeur trop petites sont également à proscrire, en effet, le code prend la valeur centrale du rectangle de détection comme point de référence pour les corrections et si les valeurs sont trop petites alors le rover ne fera jamais rien car le visage sera à cheval et ne se fera donc pas detecter par l'algorithme et donc le point central n'existera pas et donc le rover ne pourra rien reconnaitre dans ces zones limites. Des valeurs de tolérance généralement recommandées pour cette caméra se situent entre 220 et 290 pixels.
+Il est important de choisir une valeur de tolérance appropriée : une valeur trop grande rendrait la zone centrale de détection trop étroite, ce qui rendrait le comportement du rover instable car il ne parviendrait jamais à atteindre cette zone avec ses paramètres de correction (axe haut-bas 5°; axe droite-gauche 10°). Des valeur trop petites sont également à proscrire, en effet, le code prend la valeur centrale du rectangle de détection comme point de référence pour les corrections et si les valeurs sont trop petites alors le rover ne fera jamais rien car le visage sera à cheval hors de l'image et ne se fera donc pas detecter par l'algorithme et donc le point central n'existera pas et donc le rover ne pourra rien reconnaitre dans ces zones limites. Des valeurs de tolérance généralement recommandées pour cette caméra se situent entre 220 et 290 pixels.
 
 Une fois le programme lancé, il suffit de se placer devant la caméra pour démarrer la reconnaissance et le suivi. Il est important de noter que vu que la reconnaissance tourne sur Raspberry Pi elle n'est pas très vive et donc il vaut mieux éviter les mouvements brusques. De plus, l'algorithme utilisé pour la reconnaissance est très sensible à l'éclairage ce qui parfois le rend peu précis et instable (il peut penser avoir reconnu un visage dans un mur ou dans un rideau par exemple). Une fois le programme lancé il suffit de se déplacer devant le rover pour que la caméra et le rover suivent.
 
@@ -69,7 +69,6 @@ Cette partie importe les différente librairies nécessaires au fonctionnement d
 
 ```{code-block} python
 ---
-emphasize-lines: 3-4
 linenos: false
 ---
 while True:
