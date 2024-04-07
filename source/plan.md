@@ -1,5 +1,10 @@
 (plan)=
+```{figure} img/rover_track.jpg
+---
+width: 70%
+---
 
+```
 # Plan 
 
 :::{contents}
